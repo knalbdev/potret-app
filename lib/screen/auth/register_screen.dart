@@ -53,7 +53,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       );
-      context.go('/login');
+      context.pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -202,7 +202,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 16),
                     OutlinedButton(
-                      onPressed: () => context.go('/login'),
+                      onPressed: () => context.pop(),
                       child: Text(l10n.signIn),
                     ),
                     const SizedBox(height: 24),

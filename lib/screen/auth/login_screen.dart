@@ -169,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 16),
                     OutlinedButton(
-                      onPressed: () => context.go('/register'),
+                      onPressed: () => context.push('/register'),
                       child: Text(l10n.signUp),
                     ),
                     const SizedBox(height: 24),

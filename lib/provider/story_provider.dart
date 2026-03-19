@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../data/api/api_service.dart';
 import '../data/model/story.dart';
+import '../utils/error_parser.dart';
 
 enum StoryState { initial, loading, loaded, error }
 
@@ -33,7 +34,7 @@ class StoryProvider extends ChangeNotifier {
       _stories = await _apiService.getStories(token: token);
       _state = StoryState.loaded;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = parseError(e);
       _state = StoryState.error;
     }
     notifyListeners();
@@ -52,7 +53,7 @@ class StoryProvider extends ChangeNotifier {
       _selectedStory = await _apiService.getStoryDetail(token: token, id: id);
       _state = StoryState.loaded;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = parseError(e);
       _state = StoryState.error;
     }
     notifyListeners();
@@ -78,7 +79,7 @@ class StoryProvider extends ChangeNotifier {
       await fetchStories(token: token);
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = parseError(e);
       _isUploading = false;
       notifyListeners();
       return false;

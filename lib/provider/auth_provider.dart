@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../data/api/api_service.dart';
 import '../data/preferences/auth_preferences.dart';
+import '../utils/error_parser.dart';
 
 enum AuthState { initial, loading, authenticated, unauthenticated, error }
 
@@ -70,7 +71,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = parseError(e);
       _state = AuthState.error;
       notifyListeners();
       return false;
@@ -103,7 +104,7 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = parseError(e);
       _state = AuthState.error;
       notifyListeners();
       return false;
