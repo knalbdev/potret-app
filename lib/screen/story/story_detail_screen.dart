@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -92,7 +93,7 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
                         color: Colors.white,
                         size: 20,
                       ),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => context.pop(),
                     ),
                   ),
                 ),

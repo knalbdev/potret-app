@@ -38,14 +38,14 @@ class _StoryListScreenState extends State<StoryListScreen> {
         content: Text(l10n.logoutConfirm),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
+            onPressed: () => ctx.pop(false),
             child: Text(
               l10n.cancel,
               style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
+            onPressed: () => ctx.pop(true),
             child: Text(l10n.logout),
           ),
         ],
@@ -262,10 +262,7 @@ class _StoryListScreenState extends State<StoryListScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await context.push<bool>('/stories/add');
-          if (result == true && mounted) _fetchStories();
-        },
+        onPressed: () => context.push('/stories/add'),
         child: const Icon(Icons.add),
       ),
     );

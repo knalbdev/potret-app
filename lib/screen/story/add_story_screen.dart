@@ -80,7 +80,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
           ),
         ),
       );
-      context.pop(true);
+      context.go('/stories');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -132,7 +132,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                 ),
                 title: Text(l10n.camera),
                 onTap: () {
-                  Navigator.of(ctx).pop();
+                  ctx.pop();
                   _pickImage(ImageSource.camera);
                 },
               ),
@@ -150,7 +150,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                 ),
                 title: Text(l10n.gallery),
                 onTap: () {
-                  Navigator.of(ctx).pop();
+                  ctx.pop();
                   _pickImage(ImageSource.gallery);
                 },
               ),

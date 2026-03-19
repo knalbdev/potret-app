@@ -75,6 +75,7 @@ class StoryProvider extends ChangeNotifier {
       );
       _isUploading = false;
       notifyListeners();
+      await fetchStories(token: token);
       return true;
     } catch (e) {
       _errorMessage = e.toString();
