@@ -16,15 +16,36 @@ class StoryListScreen extends StatefulWidget {
 }
 
 class _StoryListScreenState extends State<StoryListScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _fetchStories());
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _fetchMore();
+    }
   }
 
   void _fetchStories() {
     final token = context.read<AuthProvider>().token ?? '';
     context.read<StoryProvider>().fetchStories(token: token);
+  }
+
+  void _fetchMore() {
+    final token = context.read<AuthProvider>().token ?? '';
+    context.read<StoryProvider>().fetchMoreStories(token: token);
   }
 
   Future<void> _onLogout() async {
@@ -161,9 +182,24 @@ class _StoryListScreenState extends State<StoryListScreen> {
             color: AppColors.warmGold,
             onRefresh: () async => _fetchStories(),
             child: ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-              itemCount: storyProvider.stories.length,
+              itemCount: storyProvider.stories.length +
+                  (storyProvider.hasMore ? 1 : 0),
               itemBuilder: (context, index) {
+                // Loading more indicator
+                if (index == storyProvider.stories.length) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.warmGold,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  );
+                }
+
                 final story = storyProvider.stories[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
@@ -193,7 +229,7 @@ class _StoryListScreenState extends State<StoryListScreen> {
                                     child: CircularProgressIndicator(
                                       value: progress.expectedTotalBytes != null
                                           ? progress.cumulativeBytesLoaded /
-                                                progress.expectedTotalBytes!
+                                              progress.expectedTotalBytes!
                                           : null,
                                       strokeWidth: 2,
                                       color: AppColors.warmGold,
@@ -239,7 +275,9 @@ class _StoryListScreenState extends State<StoryListScreen> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleSmall
-                                        ?.copyWith(fontWeight: FontWeight.w600),
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),

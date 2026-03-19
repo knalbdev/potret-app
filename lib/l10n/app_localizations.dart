@@ -331,6 +331,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create a new account to get started.'**
   String get registerSubtitle;
+
+  /// No description provided for @pickLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Location'**
+  String get pickLocation;
+
+  /// No description provided for @removeLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Location'**
+  String get removeLocation;
+
+  /// No description provided for @locationAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Location added'**
+  String get locationAdded;
+
+  /// No description provided for @tapToPickLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap on the map to pick a location'**
+  String get tapToPickLocation;
+
+  /// No description provided for @fetchingAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching address...'**
+  String get fetchingAddress;
+
+  /// No description provided for @noAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'No address available'**
+  String get noAddress;
+
+  /// No description provided for @locationOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Location on Map'**
+  String get locationOnMap;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// No description provided for @freePlanNoLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is only available in the paid plan'**
+  String get freePlanNoLocation;
+
+  /// No description provided for @loadingMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading more stories...'**
+  String get loadingMore;
 }
 
 class _AppLocalizationsDelegate

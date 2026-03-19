@@ -48,23 +48,18 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = await _apiService.login(email: email, password: password);
-      if (data['error'] == true) {
-        _errorMessage = data['message'] as String;
-        _state = AuthState.unauthenticated;
-        notifyListeners();
-        return false;
-      }
+      final loginResult = await _apiService.login(
+        email: email,
+        password: password,
+      );
 
-      final loginResult = data['loginResult'] as Map<String, dynamic>;
-      _token = loginResult['token'] as String;
-      _name = loginResult['name'] as String;
-      final userId = loginResult['userId'] as String;
+      _token = loginResult.token;
+      _name = loginResult.name;
 
       await _preferences.saveSession(
-        token: _token!,
-        userId: userId,
-        name: _name!,
+        token: loginResult.token,
+        userId: loginResult.userId,
+        name: loginResult.name,
       );
 
       _state = AuthState.authenticated;
@@ -88,18 +83,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final data = await _apiService.register(
-        name: name,
-        email: email,
-        password: password,
-      );
-      if (data['error'] == true) {
-        _errorMessage = data['message'] as String;
-        _state = AuthState.unauthenticated;
-        notifyListeners();
-        return false;
-      }
-
+      await _apiService.register(name: name, email: email, password: password);
       _state = AuthState.unauthenticated;
       notifyListeners();
       return true;

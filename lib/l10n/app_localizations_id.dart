@@ -125,4 +125,35 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get registerSubtitle => 'Buat akun baru untuk memulai.';
+
+  @override
+  String get pickLocation => 'Pilih Lokasi';
+
+  @override
+  String get removeLocation => 'Hapus Lokasi';
+
+  @override
+  String get locationAdded => 'Lokasi ditambahkan';
+
+  @override
+  String get tapToPickLocation => 'Ketuk peta untuk memilih lokasi';
+
+  @override
+  String get fetchingAddress => 'Mengambil alamat...';
+
+  @override
+  String get noAddress => 'Alamat tidak tersedia';
+
+  @override
+  String get locationOnMap => 'Lokasi di Peta';
+
+  @override
+  String get confirm => 'Konfirmasi';
+
+  @override
+  String get freePlanNoLocation =>
+      'Pilih lokasi hanya tersedia di versi berbayar';
+
+  @override
+  String get loadingMore => 'Memuat cerita lainnya...';
 }

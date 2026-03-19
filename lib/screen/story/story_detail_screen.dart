@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -76,6 +77,8 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
             );
           }
 
+          final hasLocation = story.lat != null && story.lon != null;
+
           return CustomScrollView(
             slivers: [
               SliverAppBar(
@@ -131,7 +134,6 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Author info
                       Row(
                         children: [
                           CircleAvatar(
@@ -159,7 +161,6 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
                       const SizedBox(height: 16),
                       const Divider(color: AppColors.divider),
                       const SizedBox(height: 16),
-                      // Description
                       Text(
                         story.description,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -167,6 +168,17 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
                           color: AppColors.textPrimary,
                         ),
                       ),
+                      if (hasLocation) ...[
+                        const SizedBox(height: 24),
+                        _MapSection(
+                          lat: story.lat!,
+                          lon: story.lon!,
+                          address: storyProvider.locationAddress,
+                          label: l10n.locationOnMap,
+                          fetchingAddress: l10n.fetchingAddress,
+                          noAddress: l10n.noAddress,
+                        ),
+                      ],
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -176,6 +188,119 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
           );
         },
       ),
+    );
+  }
+}
+
+class _MapSection extends StatelessWidget {
+  const _MapSection({
+    required this.lat,
+    required this.lon,
+    required this.address,
+    required this.label,
+    required this.fetchingAddress,
+    required this.noAddress,
+  });
+
+  final double lat;
+  final double lon;
+  final String? address;
+  final String label;
+  final String fetchingAddress;
+  final String noAddress;
+
+  @override
+  Widget build(BuildContext context) {
+    final position = LatLng(lat, lon);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.location_on, size: 18, color: AppColors.warmGold),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: address != null
+              ? Row(
+                  key: const ValueKey('address'),
+                  children: [
+                    const Icon(
+                      Icons.place_outlined,
+                      size: 16,
+                      color: AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        address!,
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Row(
+                  key: const ValueKey('loading'),
+                  children: [
+                    const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.warmGold,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      fetchingAddress,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+        const SizedBox(height: 12),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: SizedBox(
+            height: 220,
+            child: GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: position,
+                zoom: 15,
+              ),
+              markers: {
+                Marker(
+                  markerId: const MarkerId('story_location'),
+                  position: position,
+                  infoWindow: InfoWindow(
+                    title: address ?? fetchingAddress,
+                  ),
+                ),
+              },
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: false,
+              scrollGesturesEnabled: false,
+              zoomGesturesEnabled: false,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -6,7 +6,9 @@ import 'package:provider/provider.dart';
 
 import 'data/api/api_service.dart';
 import 'data/preferences/auth_preferences.dart';
+import 'flavor/app_flavor.dart';
 import 'l10n/app_localizations.dart';
+import 'provider/add_story_provider.dart';
 import 'provider/auth_provider.dart';
 import 'provider/locale_provider.dart';
 import 'provider/story_provider.dart';
@@ -26,7 +28,10 @@ class AppColors {
   static const divider = Color(0xFFE8DDD0);
 }
 
-void main() {
+void main() => mainApp(AppFlavor.free);
+
+void mainApp(AppFlavor flavor) {
+  FlavorConfig.flavor = flavor;
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -55,6 +60,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => StoryProvider(apiService: apiService),
         ),
+        ChangeNotifierProvider(create: (_) => AddStoryProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
       child: Builder(

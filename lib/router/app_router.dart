@@ -1,8 +1,10 @@
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../provider/auth_provider.dart';
 import '../screen/auth/login_screen.dart';
 import '../screen/auth/register_screen.dart';
+import '../screen/map/location_picker_screen.dart';
 import '../screen/splash_screen.dart';
 import '../screen/story/add_story_screen.dart';
 import '../screen/story/story_detail_screen.dart';
@@ -55,6 +57,15 @@ class AppRouter {
             GoRoute(
               path: 'add',
               builder: (context, state) => const AddStoryScreen(),
+              routes: [
+                GoRoute(
+                  path: 'location-picker',
+                  builder: (context, state) {
+                    final initial = state.extra as LatLng?;
+                    return LocationPickerScreen(initialLocation: initial);
+                  },
+                ),
+              ],
             ),
             GoRoute(
               path: ':id',

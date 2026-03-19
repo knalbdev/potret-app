@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../../flavor/app_flavor.dart';
 import '../../l10n/app_localizations.dart';
 import '../../main.dart';
+import '../../provider/add_story_provider.dart';
 import '../../provider/auth_provider.dart';
 import '../../provider/story_provider.dart';
 
@@ -21,7 +24,14 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
   final _imagePicker = ImagePicker();
-  File? _selectedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AddStoryProvider>().reset();
+    });
+  }
 
   @override
   void dispose() {
@@ -36,14 +46,27 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       maxHeight: 1920,
       imageQuality: 80,
     );
-    if (picked != null) {
-      setState(() => _selectedImage = File(picked.path));
+    if (picked != null && mounted) {
+      context.read<AddStoryProvider>().setImage(File(picked.path));
+    }
+  }
+
+  Future<void> _pickLocation() async {
+    final current = context.read<AddStoryProvider>().selectedLocation;
+    final result = await context.push<LatLng?>(
+      '/stories/add/location-picker',
+      extra: current,
+    );
+    if (result != null && mounted) {
+      context.read<AddStoryProvider>().setLocation(result);
     }
   }
 
   Future<void> _onUpload() async {
     final l10n = AppLocalizations.of(context);
-    if (_selectedImage == null) {
+    final addStoryProvider = context.read<AddStoryProvider>();
+
+    if (addStoryProvider.selectedImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.imageRequired),
@@ -60,11 +83,14 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
 
     final token = context.read<AuthProvider>().token ?? '';
     final storyProvider = context.read<StoryProvider>();
+    final location = addStoryProvider.selectedLocation;
 
     final success = await storyProvider.addStory(
       token: token,
       description: _descriptionController.text.trim(),
-      photo: _selectedImage!,
+      photo: addStoryProvider.selectedImage!,
+      lat: location?.latitude,
+      lon: location?.longitude,
     );
 
     if (!mounted) return;
@@ -168,6 +194,12 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
     final isUploading = context.select<StoryProvider, bool>(
       (p) => p.isUploading,
     );
+    final selectedImage = context.select<AddStoryProvider, File?>(
+      (p) => p.selectedImage,
+    );
+    final selectedLocation = context.select<AddStoryProvider, LatLng?>(
+      (p) => p.selectedLocation,
+    );
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.newStory)),
@@ -182,30 +214,32 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                 // Image picker area
                 GestureDetector(
                   onTap: _showImageSourceSheet,
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
                     height: 220,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: _selectedImage != null
+                        color: selectedImage != null
                             ? AppColors.warmGold
                             : AppColors.divider,
-                        width: _selectedImage != null ? 2 : 1,
+                        width: selectedImage != null ? 2 : 1,
                       ),
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: _selectedImage != null
+                    child: selectedImage != null
                         ? Stack(
                             fit: StackFit.expand,
                             children: [
-                              Image.file(_selectedImage!, fit: BoxFit.cover),
+                              Image.file(selectedImage, fit: BoxFit.cover),
                               Positioned(
                                 right: 8,
                                 top: 8,
                                 child: GestureDetector(
-                                  onTap: () =>
-                                      setState(() => _selectedImage = null),
+                                  onTap: () => context
+                                      .read<AddStoryProvider>()
+                                      .setImage(null),
                                   child: Container(
                                     padding: const EdgeInsets.all(4),
                                     decoration: const BoxDecoration(
@@ -291,6 +325,14 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
+                _LocationPickerTile(
+                  selectedLocation: selectedLocation,
+                  onPick: isUploading ? null : _pickLocation,
+                  onRemove: () =>
+                      context.read<AddStoryProvider>().setLocation(null),
+                  l10n: l10n,
+                ),
                 const SizedBox(height: 28),
                 FilledButton(
                   onPressed: isUploading ? null : _onUpload,
@@ -309,6 +351,116 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _LocationPickerTile extends StatelessWidget {
+  const _LocationPickerTile({
+    required this.selectedLocation,
+    required this.onPick,
+    required this.onRemove,
+    required this.l10n,
+  });
+
+  final LatLng? selectedLocation;
+  final VoidCallback? onPick;
+  final VoidCallback onRemove;
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!FlavorConfig.isPaid) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.warmGoldLight,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.divider),
+        ),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.lock_outline,
+              size: 18,
+              color: AppColors.warmGold,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.freePlanNoLocation,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      decoration: BoxDecoration(
+        color:
+            selectedLocation != null ? AppColors.warmGoldLight : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: selectedLocation != null
+              ? AppColors.warmGold
+              : AppColors.divider,
+          width: selectedLocation != null ? 1.5 : 1,
+        ),
+      ),
+      child: ListTile(
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            color: AppColors.warmGoldLight,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.location_on_outlined,
+            color: AppColors.warmGold,
+            size: 20,
+          ),
+        ),
+        title: Text(
+          selectedLocation != null
+              ? '${selectedLocation!.latitude.toStringAsFixed(5)}, '
+                  '${selectedLocation!.longitude.toStringAsFixed(5)}'
+              : l10n.pickLocation,
+          style: TextStyle(
+            fontSize: 14,
+            color: selectedLocation != null
+                ? AppColors.textPrimary
+                : AppColors.textSecondary,
+          ),
+        ),
+        subtitle: selectedLocation != null
+            ? Text(
+                l10n.locationAdded,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.warmGold,
+                ),
+              )
+            : null,
+        trailing: selectedLocation != null
+            ? IconButton(
+                icon: const Icon(Icons.close, size: 18),
+                color: AppColors.textSecondary,
+                onPressed: onRemove,
+              )
+            : const Icon(
+                Icons.chevron_right,
+                color: AppColors.textSecondary,
+              ),
+        onTap: onPick,
       ),
     );
   }

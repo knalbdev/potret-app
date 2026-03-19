@@ -38,5 +38,15 @@
   "language": "Language",
   "or": "or",
   "loginSubtitle": "Welcome back! Please sign in to continue.",
-  "registerSubtitle": "Create a new account to get started."
+  "registerSubtitle": "Create a new account to get started.",
+  "pickLocation": "Pick Location",
+  "removeLocation": "Remove Location",
+  "locationAdded": "Location added",
+  "tapToPickLocation": "Tap on the map to pick a location",
+  "fetchingAddress": "Fetching address...",
+  "noAddress": "No address available",
+  "locationOnMap": "Location on Map",
+  "confirm": "Confirm",
+  "freePlanNoLocation": "Location is only available in the paid plan",
+  "loadingMore": "Loading more stories..."
 }

@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Potret (Free)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_free.dart",
+      "args": ["--flavor", "free"]
+    },
+    {
+      "name": "Potret Pro (Paid)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_paid.dart",
+      "args": ["--flavor", "paid"]
+    }
+  ]
+}

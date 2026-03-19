@@ -124,4 +124,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get registerSubtitle => 'Create a new account to get started.';
+
+  @override
+  String get pickLocation => 'Pick Location';
+
+  @override
+  String get removeLocation => 'Remove Location';
+
+  @override
+  String get locationAdded => 'Location added';
+
+  @override
+  String get tapToPickLocation => 'Tap on the map to pick a location';
+
+  @override
+  String get fetchingAddress => 'Fetching address...';
+
+  @override
+  String get noAddress => 'No address available';
+
+  @override
+  String get locationOnMap => 'Location on Map';
+
+  @override
+  String get confirm => 'Confirm';
+
+  @override
+  String get freePlanNoLocation =>
+      'Location is only available in the paid plan';
+
+  @override
+  String get loadingMore => 'Loading more stories...';
 }

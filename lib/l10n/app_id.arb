@@ -38,5 +38,15 @@
   "language": "Bahasa",
   "or": "atau",
   "loginSubtitle": "Selamat datang kembali! Silakan masuk untuk melanjutkan.",
-  "registerSubtitle": "Buat akun baru untuk memulai."
+  "registerSubtitle": "Buat akun baru untuk memulai.",
+  "pickLocation": "Pilih Lokasi",
+  "removeLocation": "Hapus Lokasi",
+  "locationAdded": "Lokasi ditambahkan",
+  "tapToPickLocation": "Ketuk peta untuk memilih lokasi",
+  "fetchingAddress": "Mengambil alamat...",
+  "noAddress": "Alamat tidak tersedia",
+  "locationOnMap": "Lokasi di Peta",
+  "confirm": "Konfirmasi",
+  "freePlanNoLocation": "Pilih lokasi hanya tersedia di versi berbayar",
+  "loadingMore": "Memuat cerita lainnya..."
 }
